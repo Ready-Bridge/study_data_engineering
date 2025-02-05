@@ -1,0 +1,31 @@
+services: # docker-compose로 생성할 container 옵션을 정의
+  db: # container (service) 이름
+    # amd64 & arm64 architecture 둘 다 지원하는 mariadb 사용
+    image: mariadb:10.6.4-focal # servic의 container를 생성할 때 사용될 이미지
+    command: '--default-authentication-plugin=mysql_native_password' # container 실행 시 수행할 명령어
+    volumes: # container의 데이터를 호스트 시스템에 저장하기 위한 방법
+      - db_data:/var/lib/mysql
+    restart: always # container가 종료되었을 때 자동으로 재시작
+    environment: # service의 container 내부에서 사용할 환경 변수 지정
+      - MYSQL_ROOT_PASSWORD=somewordpress
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+    expose: # container 내부에서 사용할 포트를 호스트 시스템에 노출 (외부와의 직접 연결 X, 다른 container에서 연결 O)
+      - 3306
+      - 33060
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - wp_data:/var/www/html
+    ports:
+      - 80:80
+    restart: always
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+volumes:
+  db_data:
+  wp_data:

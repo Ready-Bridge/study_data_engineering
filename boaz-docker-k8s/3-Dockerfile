@@ -1,0 +1,13 @@
+# ubuntu image를 public registry에서 끌어와서 base image 지정
+FROM ubuntu:18.04
+
+# Debian 서버와 최신 싱크 맞추기 위해 설치 가능한 리스트를 업데이트 하고 redis-server 설치 후 패키지 설치를 위해 다운받은 데이터 삭제 (&&로 이어서 layer를 1개로 유지함)
+RUN apt-get update && \ 
+    apt-get install -y redis-server && \
+    apt-get clean
+
+# container로 들어오는 네트워크 트래픽을 listening할 포트 지정 (redis 서버가 수신할 포트를 정의)
+EXPOSE 6379
+
+# image가 실행될 때 실행될 default 커맨드 지정 (conatiner가 실행될 때 redis 서버를 보안 모드를 끈 채로 실행)
+CMD ["redis-server", "--protected-mode no"]
